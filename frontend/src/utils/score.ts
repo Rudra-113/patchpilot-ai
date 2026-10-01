@@ -8,8 +8,27 @@ export const SEVERITY_WEIGHTS: Record<Severity, number> = {
   low: 1,
 };
 
+const SEVERITY_ORDER: Record<Severity, number> = {
+  critical: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
 export function isOpenFinding(finding: Finding) {
   return finding.status !== "verified";
+}
+
+/** Open findings first, then severity, so the next thing to prove is at the top. */
+export function sortFindings(findings: Finding[]) {
+  return [...findings].sort((left, right) => {
+    const leftOpen = isOpenFinding(left) ? 0 : 1;
+    const rightOpen = isOpenFinding(right) ? 0 : 1;
+    if (leftOpen !== rightOpen) return leftOpen - rightOpen;
+    const bySeverity = SEVERITY_ORDER[left.severity] - SEVERITY_ORDER[right.severity];
+    if (bySeverity !== 0) return bySeverity;
+    return left.line - right.line;
+  });
 }
 
 export function scoreFromFindings(findings: Finding[]) {

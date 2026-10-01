@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
 import { DemoNotice } from "../components/common/DemoNotice";
+import { NextMission } from "../components/workflow/NextMission";
 import { PageHeader } from "../components/common/PageHeader";
 import { useAppState } from "../context/AppContext";
 import { usePageTitle } from "../hooks/usePageTitle";
@@ -62,6 +63,11 @@ export function VerificationPage() {
       {!hero ? <Unverified /> : null}
       {hero?.verification?.verified ? <VerifiedHero finding={hero} /> : null}
       {hero && hero.verification && !hero.verification.verified ? <FailedHero finding={hero} /> : null}
+      {hero ? (
+        <div className="mt-4">
+          <NextMission excludeId={hero.id} />
+        </div>
+      ) : null}
 
       {verified.length > 1 ? (
         <div className="mt-4 grid gap-3">

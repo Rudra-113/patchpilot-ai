@@ -5,6 +5,7 @@ import { useAppState } from "../../context/AppContext";
 import { wait } from "../../utils/format";
 import { cx } from "../../utils/cx";
 import { CodeDiff } from "../code/CodeDiff";
+import { NextMission } from "./NextMission";
 
 const steps = [
   "Analyzing vulnerability...",
@@ -201,6 +202,9 @@ export function FixPanel({ finding }: { finding: Finding }) {
           {finding.testResult?.note ? <p className="mt-2 text-xs leading-relaxed text-faint">{finding.testResult.note}</p> : null}
           <div className="mt-4">
             <CodeDiff file={fix.file} before={fix.before} after={fix.after} />
+          </div>
+          <div className="mt-4">
+            <NextMission excludeId={finding.id} />
           </div>
         </div>
       ) : null}

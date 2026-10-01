@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { PageHeader } from "../components/common/PageHeader";
 import { StatusPill } from "../components/common/StatusPill";
+import { NextMission } from "../components/workflow/NextMission";
 import { useAppState } from "../context/AppContext";
 import { usePageTitle } from "../hooks/usePageTitle";
 
@@ -17,6 +18,11 @@ export function FixesPage() {
         title="Fixes"
         description="A generated patch is ready for review. It stays unverified until tests pass and the original finding disappears from a rescan."
       />
+      {fixes.length > 0 ? (
+        <div className="mb-4">
+          <NextMission />
+        </div>
+      ) : null}
       {fixes.length === 0 ? (
         <div className="panel max-w-2xl p-6">
           <p className="text-[11px] tracking-[0.18em] text-accent">NO PATCHES YET</p>

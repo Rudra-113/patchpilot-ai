@@ -1,4 +1,5 @@
 import { useState, type DragEvent, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { ApiFailure } from "../services/api";
 import { DemoNotice } from "../components/common/DemoNotice";
 import { PageHeader } from "../components/common/PageHeader";
@@ -119,6 +120,14 @@ export function ScanPage() {
           </label>
         </div>
       </div>
+
+      {app.scan && app.scan.status !== "running" && app.findings.length > 0 ? (
+        <div className="mt-4">
+          <Link to="/vulnerabilities" className="btn-secondary">
+            Review {app.findings.length} findings
+          </Link>
+        </div>
+      ) : null}
 
       {formError ? (
         <div className="mt-4 rounded-2xl border border-critical/40 bg-critical/8 px-4 py-3" role="alert">

@@ -3,6 +3,7 @@ import { PageHeader } from "../components/common/PageHeader";
 import { FindingRow } from "../components/security/FindingRow";
 import { useAppState } from "../context/AppContext";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { sortFindings } from "../utils/score";
 const filters = ["All", "Critical", "High", "Medium", "Low", "Resolved", "Unresolved"] as const;
 
 export function VulnerabilitiesPage() {
@@ -13,7 +14,7 @@ export function VulnerabilitiesPage() {
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return app.findings.filter((finding) => {
+    return sortFindings(app.findings).filter((finding) => {
       if (filter === "Resolved" && finding.status !== "verified") return false;
       if (filter === "Unresolved" && finding.status === "verified") return false;
       if (["Critical", "High", "Medium", "Low"].includes(filter) && finding.severity !== filter.toLowerCase()) return false;

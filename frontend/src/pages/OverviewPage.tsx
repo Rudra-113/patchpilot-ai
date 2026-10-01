@@ -5,11 +5,12 @@ import { SecurityScore } from "../components/common/SecurityScore";
 import { FindingRow } from "../components/security/FindingRow";
 import { KpiCard } from "../components/security/KpiCard";
 import { ScoreTrend } from "../components/security/ScoreTrend";
+import { NextMission } from "../components/workflow/NextMission";
 import { demoScoreTrend } from "../data/demo";
 import { useAppState } from "../context/AppContext";
 import { usePageTitle } from "../hooks/usePageTitle";
 import type { PipelineStage } from "../types/security";
-import { countsFromFindings, scoreFromFindings, SEVERITY_WEIGHTS } from "../utils/score";
+import { countsFromFindings, scoreFromFindings, SEVERITY_WEIGHTS, sortFindings } from "../utils/score";
 
 function missionState(stages: PipelineStage[], ids: string[]) {
   const selected = stages.filter((stage) => ids.includes(stage.id));
@@ -73,6 +74,9 @@ export function OverviewPage() {
         description="Counts and the score are calculated from the findings in this workspace. A finding leaves the score only after verification evidence exists."
       />
       {app.scan.demoMode ? <DemoNotice>{app.scan.note}</DemoNotice> : null}
+      <div className="mb-4">
+        <NextMission />
+      </div>
 
       <section className="panel flex flex-col gap-6 p-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="grid flex-1 gap-5 sm:grid-cols-3">
@@ -115,7 +119,7 @@ export function OverviewPage() {
             </Link>
           </div>
           <div>
-            {findings.map((finding) => (
+            {sortFindings(findings).map((finding) => (
               <FindingRow key={finding.id} finding={finding} href={`/vulnerabilities/${finding.id}`} />
             ))}
           </div>

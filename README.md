@@ -35,7 +35,7 @@ The demo workspace is `patchpilot-demo`. Its opening score is **72 / 100**, from
 
 `100 − (critical×7 + high×3 + medium×1 + low×1)`
 
-Verifying the SQL injection finding moves the score to 79. Verifying every open finding reaches 100 and **SECURE**.
+Verifying the SQL injection finding moves the score to 79. The command center then points at the next open finding. Proving the remaining critical finding lifts the score to 86. Verifying every open finding reaches 100 and **SECURE**.
 
 ## Architecture
 
