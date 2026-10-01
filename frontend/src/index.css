@@ -209,6 +209,15 @@ body {
   filter: drop-shadow(0 0 10px rgba(0, 229, 160, 0.28));
 }
 
+.verified-glow {
+  background:
+    radial-gradient(ellipse at top, rgba(0, 229, 160, 0.18), transparent 55%),
+    linear-gradient(180deg, rgba(16, 25, 35, 0.96), rgba(8, 16, 18, 0.94));
+  box-shadow:
+    0 0 80px rgba(0, 229, 160, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
 .status-dot {
   animation: pulse-dot 2.4s ease-out infinite;
 }

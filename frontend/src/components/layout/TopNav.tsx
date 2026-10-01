@@ -5,7 +5,7 @@ import { SecurityScore } from "../common/SecurityScore";
 
 export function TopNav({ onMenu }: { onMenu: () => void }) {
   const app = useAppState();
-  const score = scoreFromFindings(app.findings);
+  const score = app.scan ? scoreFromFindings(app.findings) : null;
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-line bg-canvas/85 px-4 backdrop-blur-xl sm:px-6">
@@ -37,7 +37,7 @@ export function TopNav({ onMenu }: { onMenu: () => void }) {
         <span className="hidden rounded-full border border-accent/30 bg-accent/10 px-2.5 py-1 text-[10px] font-semibold tracking-[0.16em] text-accent sm:inline-flex">
           DEMO MODE
         </span>
-        <SecurityScore score={score} layout="inline" />
+        {score === null ? <span className="text-xs text-muted">Loading score</span> : <SecurityScore score={score} layout="inline" />}
       </div>
     </header>
   );

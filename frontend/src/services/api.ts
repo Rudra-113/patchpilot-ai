@@ -1,64 +1,103 @@
 import axios from "axios";
-import type { ActivityEvent, Finding, HealthResponse, ScanRecord } from "../types/security";
+import type {
+  ActivityEvent,
+  Finding,
+  HealthResponse,
+  Scan,
+  ScanSummary,
+  SettingsStatus,
+  TestResult,
+  Verification,
+} from "../types/security";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api",
   timeout: 60_000,
 });
 
-export async function getHealth(): Promise<HealthResponse> {
-  const { data } = await api.get<HealthResponse>("/health");
-  return data;
+export class ApiFailure extends Error {
+  detail: string;
+
+  constructor(message: string, detail = "") {
+    super(message);
+    this.name = "ApiFailure";
+    this.detail = detail;
+  }
 }
 
-export async function scanRepository(payload: { url: string; branch?: string }): Promise<ScanRecord> {
-  const { data } = await api.post<ScanRecord>("/scan", payload);
-  return data;
+function unwrap(error: unknown): never {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data?.detail as { message?: string; detail?: string } | string | undefined;
+    if (typeof data === "string") {
+      throw new ApiFailure(data);
+    }
+    if (data && typeof data === "object") {
+      throw new ApiFailure(data.message ?? "Request failed.", data.detail ?? "");
+    }
+    throw new ApiFailure("The API did not respond.", "Start the PatchPilot backend and try again.");
+  }
+  throw new ApiFailure("Request failed.");
 }
 
-export async function uploadRepository(file: File): Promise<ScanRecord> {
+async function request<T>(call: () => Promise<{ data: T }>): Promise<T> {
+  try {
+    const response = await call();
+    return response.data;
+  } catch (error) {
+    unwrap(error);
+  }
+}
+
+export function getHealth() {
+  return request<HealthResponse>(() => api.get("/health"));
+}
+
+export function scanRepository(payload: { url: string; branch?: string }) {
+  return request<Scan>(() => api.post("/scan", payload));
+}
+
+export function uploadRepository(file: File) {
   const body = new FormData();
   body.append("file", file);
-  const { data } = await api.post<ScanRecord>("/repositories/upload", body);
-  return data;
+  return request<Scan>(() => api.post("/repositories/upload", body));
 }
 
-export async function getScan(scanId: string): Promise<ScanRecord> {
-  const { data } = await api.get<ScanRecord>(`/scans/${scanId}`);
-  return data;
+export function getScan(scanId: string) {
+  return request<Scan>(() => api.get(`/scans/${scanId}`));
 }
 
-export async function getFindings(scanId: string): Promise<Finding[]> {
-  const { data } = await api.get<Finding[]>(`/scans/${scanId}/findings`);
-  return data;
+export function getScans() {
+  return request<ScanSummary[]>(() => api.get("/scans"));
 }
 
-export async function getFinding(findingId: string): Promise<Finding> {
-  const { data } = await api.get<Finding>(`/findings/${findingId}`);
-  return data;
+export function getFindings(scanId: string) {
+  return request<Finding[]>(() => api.get(`/scans/${scanId}/findings`));
 }
 
-export async function generateFix(findingId: string): Promise<Finding> {
-  const { data } = await api.post<Finding>(`/findings/${findingId}/generate-fix`);
-  return data;
+export function getFinding(findingId: string) {
+  return request<Finding>(() => api.get(`/findings/${findingId}`));
 }
 
-export async function applyFix(findingId: string): Promise<Finding> {
-  const { data } = await api.post<Finding>(`/findings/${findingId}/apply-fix`);
-  return data;
+export function generateFix(findingId: string) {
+  return request<Finding>(() => api.post(`/findings/${findingId}/generate-fix`));
 }
 
-export async function runTests(findingId: string): Promise<{ passed: number; failed: number }> {
-  const { data } = await api.post<{ passed: number; failed: number }>(`/findings/${findingId}/test`);
-  return data;
+export function applyFix(findingId: string) {
+  return request<Finding>(() => api.post(`/findings/${findingId}/apply-fix`));
 }
 
-export async function verifyFix(findingId: string): Promise<{ verified: boolean; summary: string }> {
-  const { data } = await api.post<{ verified: boolean; summary: string }>(`/findings/${findingId}/verify`);
-  return data;
+export function runTests(findingId: string) {
+  return request<TestResult>(() => api.post(`/findings/${findingId}/test`));
 }
 
-export async function getActivity(scanId: string): Promise<ActivityEvent[]> {
-  const { data } = await api.get<ActivityEvent[]>(`/activity/${scanId}`);
-  return data;
+export function verifyFix(findingId: string) {
+  return request<Verification>(() => api.post(`/findings/${findingId}/verify`));
+}
+
+export function getActivity(scanId: string) {
+  return request<ActivityEvent[]>(() => api.get(`/activity/${scanId}`));
+}
+
+export function getSettings() {
+  return request<SettingsStatus>(() => api.get("/settings"));
 }
