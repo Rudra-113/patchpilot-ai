@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DEMO_MODE: "true"
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+    ports:
+      - "43123:43123"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api
+    depends_on:
+      - backend
